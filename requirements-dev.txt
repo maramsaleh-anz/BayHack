@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=7            # python -m pytest
+nbconvert>=7         # re-run the notebook and store its outputs
+ipykernel>=6

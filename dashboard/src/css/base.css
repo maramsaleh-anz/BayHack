@@ -1,0 +1,43 @@
+/* Layout: emerald hero band with a geometric star motif, sticky section nav, then card grids per question. */
+:root {
+  --bg: #F4F7F5;
+  --surface: #FFFFFF;
+  --surface-2: #EEF3F0;
+  --ink: #12221E;
+  --muted: #5B6C67;
+  --line: #DCE5E1;
+  --grid: #E7EEEB;
+  --accent: #0F6B57;
+  --accent-ink: #FFFFFF;
+  --gold: #B9842A;
+  --soft: #E2EFEA;
+  --bar-muted: #C6D4CF;
+  --bad: #B0473B;
+  --good: #17734B;
+  --hero-1: #0B4F41;
+  --hero-2: #12735E;
+  --shadow: 0 1px 2px rgba(16, 40, 34, .05), 0 8px 24px -12px rgba(16, 40, 34, .18);
+  --font-display: "Noto Kufi Arabic", "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --r: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1412; --surface: #121E1B; --surface-2: #172622; --ink: #E6EFEB; --muted: #94A7A1; --line: #23352F; --grid: #1B2B27;
+    --accent: #3DB394; --accent-ink: #062019; --gold: #E0B25A; --soft: #163029; --bar-muted: #34483F; --bad: #E27B6D; --good: #5BC993;
+    --hero-1: #082E26; --hero-2: #0D4A3D; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1412; --surface: #121E1B; --surface-2: #172622; --ink: #E6EFEB; --muted: #94A7A1; --line: #23352F; --grid: #1B2B27;
+  --accent: #3DB394; --accent-ink: #062019; --gold: #E0B25A; --soft: #163029; --bar-muted: #34483F; --bad: #E27B6D; --good: #5BC993;
+  --hero-1: #082E26; --hero-2: #0D4A3D; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1240px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3, p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }

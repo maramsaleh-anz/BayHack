@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة أوقات التبرع – إحسان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700;800&display=swap">
+<style>
+{{STYLES}}</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <span class="brand"><span class="brand-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6z"/></svg></span>لوحة تحليلات التبرع · لفريق إحسان</span>
+      <button class="theme-btn" id="themeBtn" type="button">الوضع الداكن</button>
+    </div>
+    <h1>متى يتبرّع الناس أكثر؟</h1>
+    <p class="lead" id="lead"></p>
+    <p class="meta-line" id="metaLine"></p>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="أقسام اللوحة">
+  <div class="wrap">
+    <a href="#best">أفضل الفترات</a>
+    <a href="#planner">تقويم التذكيرات</a>
+    <a href="#hours">الساعات</a>
+    <a href="#days">الأسبوع والشهر</a>
+    <a href="#seasons">المواسم</a>
+    <a href="#projects">المشاريع</a>
+    <a href="#method">المنهجية</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+
+    <section class="sec" id="best">
+      <div class="sec-head">
+        <span class="eyebrow">للتخطيط</span>
+        <h2>أفضل الفترات لتجربة الحملات</h2>
+        <p>الفترات التي ارتفع فيها عدد المتبرعين اليومي بوضوح، بعد ضبط نمو المنصة ويوم الأسبوع والمواسم وأيام الرواتب. مرتبة من الأعلى.</p>
+      </div>
+      <div class="ranks" id="ranks"></div>
+      <div class="card">
+        <div class="card-head">
+          <h3>أثر كل عامل على عدد المتبرعين في اليوم</h3>
+          <div class="legend">
+            <span><i class="sw" style="background:var(--accent)"></i>ارتفاع واضح</span>
+            <span><i class="sw" style="background:var(--bad)"></i>انخفاض واضح</span>
+            <span><i class="sw" style="background:var(--bar-muted)"></i>لا دليل واضح</span>
+          </div>
+        </div>
+        <p class="note">النقطة هي التغيّر المقدّر، والخط هو مدى الثقة ٩٥٪. الخط المتقطع يعني «لا تغيير».</p>
+        <div class="chart" id="forest" style="min-height:440px"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="planner">
+      <div class="sec-head">
+        <span class="eyebrow">للتنفيذ الأسبوعي</span>
+        <h2>تقويم التذكيرات</h2>
+        <p>كل يوم قادم بمضاعف متوقع لعدد المتبرعين مقارنة بيوم عادي، محسوب من نتائج النموذج نفسها في «أفضل الفترات»، مع وقت الإرسال المقترح ونوع الرسالة. اضغط أي يوم لترى تفاصيله.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="seg" role="group" aria-label="الفترة المعروضة">
+            <button type="button" id="v-ram" data-v="ram" aria-pressed="true">رمضان</button>
+            <button type="button" id="v-year" data-v="year" aria-pressed="false">12 شهراً قادمة</button>
+          </div>
+          <div class="legend">
+            <span><i class="sw" style="background:var(--accent)"></i>ذروة (×3 فأكثر)</span>
+            <span><i class="sw" style="background:color-mix(in srgb,var(--accent) 42%,var(--surface))"></i>مرتفع (×1.4 إلى ×3)</span>
+            <span><i class="sw" style="background:var(--surface-2)"></i>عادي</span>
+            <span><i class="sw dash"></i>منخفض</span>
+            <span><i class="sw hatch"></i>العيد: لا ارتفاع في البيانات</span>
+          </div>
+        </div>
+        <div class="pl-kpis" id="plKpis"></div>
+        <div class="pl-body">
+          <div class="pl-months" id="plCal"></div>
+          <aside class="card pl-detail" id="plDetail" aria-live="polite"></aside>
+        </div>
+      </div>
+      <div class="card">
+        <h3>جدول الإرسال المقترح للفترة</h3>
+        <p class="note">وقت الإرسال ساعة قبل ذروة الساعة المحسوبة من بيانات التبرع. نوع الرسالة اقتراح: الموسم يزيد عدد المتبرعين لا متوسط المبلغ، فنجذب في الموسم ونستبقي خارجه.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>الفترة</th><th>التواريخ</th><th>المضاعف</th><th>وقت الإرسال</th><th class="hide-narrow">نوع الرسالة</th></tr></thead>
+          <tbody id="plAgenda"></tbody>
+        </table></div>
+      </div>
+      <ul class="notes" id="plNotes"></ul>
+    </section>
+
+    <section class="sec" id="hours">
+      <div class="sec-head">
+        <span class="eyebrow">للإشعارات والرسائل</span>
+        <h2>الساعات الأكثر تبرعاً</h2>
+        <p>أرسل التذكير قبل ساعة الذروة بقليل. الساعات بنظام ٢٤ ساعة كما سُجلت في النظام.</p>
+      </div>
+      <div class="grid">
+        <div class="card wide">
+          <div class="card-head">
+            <h3>خريطة الأسبوع: اليوم × الساعة</h3>
+            <div class="seg" role="group" aria-label="المقياس">
+              <button type="button" id="m-donations" data-m="donations" aria-pressed="true">التبرعات</button>
+              <button type="button" id="m-donors" data-m="donors" aria-pressed="false">المتبرعون</button>
+              <button type="button" id="m-amount" data-m="amount" aria-pressed="false">المبلغ</button>
+            </div>
+          </div>
+          <div class="scale"><span>أقل</span><i></i><span>أكثر</span><span>· المربع المحاط بإطار هو الأعلى</span></div>
+          <div class="chart" id="heat" style="min-height:250px"></div>
+        </div>
+        <div class="card">
+          <h3>ساعة اليوم</h3>
+          <p class="note">طول كل قطاع = عدد التبرعات في تلك الساعة على كامل الفترة. الذهبي هو الذروة.</p>
+          <div class="chart" id="clock" style="min-height:320px"></div>
+        </div>
+        <div class="card">
+          <h3>رمضان مقابل باقي السنة</h3>
+          <p class="note">نسبة تبرعات كل ساعة من مجموع اليوم. في رمضان ذروتان: السحور وقبيل الإفطار.</p>
+          <div class="legend"><span><i class="sw line" style="background:var(--gold)"></i>رمضان</span><span><i class="sw line" style="background:var(--accent)"></i>باقي السنة</span></div>
+          <div class="chart" id="hourly"></div>
+        </div>
+        <div class="card wide">
+          <h3>أكثر ٥ أوقات تبرعاً في الأسبوع</h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>#</th><th>اليوم</th><th>الساعة</th><th>التبرعات</th><th class="hide-narrow">المتبرعون</th><th class="hide-narrow">المبلغ (ريال)</th></tr></thead>
+            <tbody id="slots"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="days">
+      <div class="sec-head">
+        <span class="eyebrow">للجدولة الأسبوعية والشهرية</span>
+        <h2>الأسبوع والشهر</h2>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>متوسط المتبرعين حسب يوم الأسبوع</h3>
+          <p class="note">الجمعة أعلى من بقية أيام الأسبوع بشكل ثابت، والسبت الأقل.</p>
+          <div class="chart" id="weekday"></div>
+        </div>
+        <div class="card">
+          <h3>متوسط المتبرعين حسب يوم الشهر الميلادي</h3>
+          <p class="note">خارج رمضان وذي الحجة. الأيام الملوّنة (<span id="payRange"></span>) حول صرف التقاعد ورواتب الدولة.</p>
+          <div class="chart" id="dom"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="seasons">
+      <div class="sec-head">
+        <span class="eyebrow">للتخطيط السنوي</span>
+        <h2>المواسم الهجرية</h2>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>متوسط المتبرعين في اليوم حسب الشهر الهجري</h3>
+          <p class="note">رمضان وذو الحجة ملوّنان لأنهما موسما الارتفاع الواضح.</p>
+          <div class="chart" id="hijri"></div>
+        </div>
+        <div class="card">
+          <h3>كل يوم من رمضان</h3>
+          <p class="note">العشر الأواخر ملوّنة بالذهبي. يرتفع التبرع كلما اقتربت ليالي العشر.</p>
+          <div class="chart" id="ramadan"></div>
+        </div>
+        <div class="card wide">
+          <div class="card-head">
+            <h3>المتبرعون يومياً على طول الفترة</h3>
+            <div class="legend"><span><i class="sw line" style="background:var(--accent)"></i>متبرعون في اليوم</span><span><i class="sw" style="background:var(--gold);opacity:.3"></i>شهر رمضان</span></div>
+          </div>
+          <div class="chart" id="trend" style="min-height:280px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="projects">
+      <div class="sec-head">
+        <span class="eyebrow">المحتوى</span>
+        <h2>أكثر المشاريع تبرعاً</h2>
+        <p>أعلى ١٠ مشاريع بعدد التبرعات اليدوية.</p>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>المشروع</th><th>التبرعات</th><th class="hide-narrow">المتبرعون</th><th>المبلغ (ريال)</th></tr></thead>
+          <tbody id="proj"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section class="sec" id="method">
+      <div class="sec-head">
+        <span class="eyebrow">للشفافية</span>
+        <h2>كيف حُسبت الأرقام</h2>
+      </div>
+      <ul class="notes" id="notes"></ul>
+    </section>
+  </div>
+</main>
+
+<footer><div class="wrap">مصدر البيانات: ehsan_rows_2021-04_2023-06.csv ونتائج دفتر كولاب. أُعدّت اللوحة لاستخدام فريق إحسان الداخلي.</div></footer>
+<div id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const DATA = {{DATA}};
+</script>
+<script>
+{{PLANNER_CORE}}
+</script>
+<script>
+(function () {
+{{APP_JS}}
+})();
+</script>
+</body>
+</html>

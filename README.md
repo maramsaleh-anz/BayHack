@@ -5,7 +5,7 @@
 تحليل أوقات التبرع اليدوي في منصة إحسان (أبريل 2021 – يونيو 2023) لترشيح أفضل الأوقات لإطلاق الحملات وإرسال التذكيرات، مع لوحة تفاعلية لفريق إحسان.
 
 - **اللوحة التفاعلية:** https://maramsaleh-anz.github.io/BayHack/ (الملف `index.html`)
-- **تبويب «تقويم التذكيرات»** في اللوحة: أيام رمضان القادم والأشهر الـ12 القادمة بمضاعف متوقع لكل يوم ووقت الإرسال ونوع الرسالة، محسوبة من معاملات النموذج نفسه. يُبنى مع اللوحة بالأمر نفسه أدناه، ويقبل `?today=YYYY-MM-DD` في الرابط لتثبيت تاريخ العرض.
+- **تبويب «تقويم التذكيرات»** في اللوحة: أيام رمضان القادم والأشهر الـ12 القادمة بمضاعف متوقع لكل يوم ووقت الإرسال ونوع الرسالة، محسوبة من معاملات النموذج نفسه.
 - **الملخص التنفيذي:** [`report/executive_summary.pdf`](report/executive_summary.pdf)
 - **تقرير استخدام الذكاء الاصطناعي:** [`ai_usage_log.md`](ai_usage_log.md) ونسخة PDF في [`report/ai_usage_report.pdf`](report/ai_usage_report.pdf)
 
@@ -29,38 +29,54 @@
 
 ```
 .
-├── README.md
-├── analysis.ipynb                 # التحليل كاملاً (14 خلية): الرواتب، المواسم، الجمعة، الثبات، التوقع، ساعة اليوم
-├── index.html                     # اللوحة التفاعلية (ملف مستقل، البيانات مضمّنة)
+├── analysis.ipynb          # قصة التحليل خطوة بخطوة (خلايا قصيرة تستدعي الحزمة bayyin)
+├── bayyin/                 # كود التحليل: وحدة صغيرة لكل غرض
+│   ├── config.py           #   كل الاختيارات في مكان واحد: المسارات، المواسم، قواعد الصرف، إعدادات النموذج
+│   ├── data.py             #   الخطوات 1–5: التنظيف وجدولا متبرع-يوم واليوم
+│   ├── paydays.py          #   الخطوة 6: تقويم الصرف ونوافذه
+│   ├── models.py           #   نماذج بواسون: الرواتب، المواسم، يوم الأسبوع، الفترات المرشّحة
+│   ├── robustness.py       #   اختبار الثبات (9 متغيرات)
+│   ├── forecast.py         #   نموذج التوقع
+│   ├── hours.py            #   ساعة اليوم
+│   ├── plots.py            #   الرسوم
+│   └── pipeline.py         #   تشغيل كل شيء وحفظ الجداول  (python -m bayyin)
+├── dashboard/
+│   ├── src/                #   مصدر اللوحة: index.html (الهيكل) وcss/ وjs/ (ملف لكل غرض)
+│   ├── prepare_data.py     #   يبني الجداول المجمّعة (ويشتق model_results.csv من الدفتر تلقائياً)
+│   └── build.py            #   يجمع كل شيء في index.html مستقل
+├── index.html              # اللوحة التفاعلية (ناتج البناء؛ لا يُعدَّل يدوياً)
 ├── data_clean/
 │   ├── ehsan_rows_2021-04_2023-06.csv   # البيانات بعد التنظيف (فاصلة منقوطة ;)
 │   └── dashboard_data/                  # الجداول المجمّعة التي تقرأها اللوحة
-├── scripts/
-│   ├── prepare_dashboard_data.py  # يبني الجداول المجمّعة من الملف النظيف
-│   ├── build_dashboard.py         # يدمج الجداول في قالب اللوحة ويُخرج index.html
-│   └── dashboard_template.html    # قالب اللوحة
 ├── outputs/
-│   ├── figures/                   # رسوم الدفتر (المواسم، الرواتب، التوقع، الساعات) ولقطات اللوحة
-│   └── tables/                    # كل جداول النتائج من الدفتر (بدون معرفات المتبرعين)
-├── report/
-│   ├── executive_summary.pdf
-│   └── ai_usage_report.pdf
-└── ai_usage_log.md
+│   ├── figures/            # رسوم الدفتر ولقطات اللوحة
+│   └── tables/             # كل جداول النتائج (بدون معرفات المتبرعين)
+├── tests/                  # اختبارات بايثون وJavaScript (تحمي الأرقام والقواعد)
+├── pitch_deck/             # عرض المسابقة ونص الإلقاء
+├── report/                 # الملخص التنفيذي وتقرير الذكاء الاصطناعي
+├── requirements.txt        # المكتبات المطلوبة
+└── Makefile                # أمر لكل مهمة
 ```
 
 ## طريقة التشغيل
 
-**التحليل:** افتح `analysis.ipynb` في Google Colab واختر `Runtime → Restart session and run all`؛ الخلية الأولى تطلب رفع `data_clean/ehsan_rows_2021-04_2023-06.csv`. ومن جذر المستودع محلياً يُقرأ الملف مباشرة: `pip install pandas statsmodels hijridate matplotlib` ثم شغّل الدفتر. المخرجات تُحفظ في `outputs/tables/` و`outputs/figures/`.
-
-**اللوحة:** من جذر المستودع:
-
 ```bash
-pip install pandas
-python scripts/prepare_dashboard_data.py data_clean/ehsan_rows_2021-04_2023-06.csv
-python scripts/build_dashboard.py data_clean/dashboard_data scripts/dashboard_template.html index.html
+pip install -r requirements.txt
+python -m bayyin               # التحليل كاملاً: يكتب outputs/tables وoutputs/figures
+python dashboard/build.py      # الجداول المجمّعة ثم index.html
 ```
 
-ثم افتح `index.html` في المتصفح (يحتاج إنترنت لتحميل الخطوط ومكتبة d3). ملف `model_results.csv` منقول من مخرجات الدفتر.
+**الدفتر:** افتح `analysis.ipynb` في Google Colab واختر `Runtime → Restart session and run all`؛ الخلية الأولى تنسخ المستودع (فيه الملف النظيف). ومن جذر المستودع محلياً يعمل مباشرة.
+
+**اللوحة:** افتح `index.html` في المتصفح (يحتاج إنترنت لتحميل الخطوط ومكتبة d3). لتعديلها عدّل الملفات في `dashboard/src/` ثم شغّل `python dashboard/build.py`. تبويب «تقويم التذكيرات» منطقه في `dashboard/src/js/planner-core.js`، ويقبل `?today=YYYY-MM-DD` في الرابط لتثبيت تاريخ العرض.
+
+**الاختبارات:**
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest               # يعيد إنتاج كل الجداول من البيانات ويقارنها بالمحفوظة حرفاً بحرف
+node --test                    # يقارن حساب التقويم في المتصفح مع hijridate وتقويم الصرف في بايثون
+```
 
 ## المنهجية باختصار
 
