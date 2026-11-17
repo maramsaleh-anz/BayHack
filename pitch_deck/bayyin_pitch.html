@@ -9,11 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --petrol:#2B6F80; --petrol-d:#1F5A69; --petrol-l:#4A8A99;
-  --gold:#E8CC93; --gold-ink:#9A6E1F;
-  --lime:#DCEDB8; --mist:#C6D9DD; --ice:#EEF5F6;
-  --ink:#1F3A42; --muted:#5E7378; --paper:#FFFFFF; --cream:#F8F4EC;
-  --coral:#EC9B80;
+  --petrol:#4F7F8B; --petrol-d:#3E6772; --petrol-l:#6D9AA5;
+  --gold:#E8D5AA; --gold-ink:#8A6A2A;
+  --lime:#CFE3D6; --mist:#CBDCDF; --ice:#EEF4F5;
+  --ink:#2E4650; --muted:#62777D; --paper:#FFFFFF; --cream:#F6F3EC;
+  --coral:#E3B5A4;
   --page:#E8EBEA;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -55,16 +55,16 @@ body.present .bar:hover{opacity:1}
 
 /* S1 cover */
 .s-cover{background:var(--petrol)}
-.s-cover .photo{position:absolute;inset:56px;border-radius:56px;overflow:hidden;background:#1F5A69}
+.s-cover .photo{position:absolute;inset:56px;border-radius:56px;overflow:hidden;background:#3E6772}
 .s-cover .photo img{width:100%;height:100%;object-fit:cover;object-position:right top;filter:saturate(.9)}
 .s-cover .photo img{filter:blur(3px) saturate(.85);transform:scale(1.04)}
-.s-cover .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(200deg,rgba(43,111,128,.30) 0%,rgba(31,90,105,.72) 100%)}
+.s-cover .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(200deg,rgba(79,127,139,.28) 0%,rgba(62,103,114,.70) 100%)}
 .s-cover .ring{position:absolute;inset:56px;border:30px solid #fff;border-radius:56px;pointer-events:none}
 .s-cover .tab{position:absolute;right:56px;bottom:56px;background:#fff;border-radius:0 56px 0 56px;padding:44px 64px 52px 80px;max-width:1400px}
 .s-cover .tab h1{font-size:122px;color:var(--ink);line-height:1.02}
 .s-cover .tab p{font:600 32px "IBM Plex Sans Arabic";color:var(--muted);margin-top:18px}
 .s-cover .logo-tab{position:absolute;left:56px;top:56px;background:#fff;border-radius:56px 0 56px 0;padding:30px 44px 30px 44px;color:var(--petrol)}
-.s-cover .meta{position:absolute;right:120px;top:118px;color:#fff;font:600 22px "IBM Plex Sans Arabic";line-height:1.5;background:rgba(31,90,105,.6);padding:16px 26px;border-radius:20px}
+.s-cover .meta{position:absolute;right:120px;top:118px;color:#fff;font:600 22px "IBM Plex Sans Arabic";line-height:1.5;background:rgba(62,103,114,.6);padding:16px 26px;border-radius:20px}
 
 /* S2 why */
 .s-why{background:var(--paper)}
@@ -84,7 +84,7 @@ body.present .bar:hover{opacity:1}
 .s-data h2{font-size:120px}
 .s-data .grid{position:absolute;right:96px;left:96px;top:300px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
 .s-data .c{background:var(--petrol-d);border-radius:36px;padding:36px 38px;min-height:400px;display:flex;flex-direction:column;gap:14px}
-.s-data .c .ico{width:56px;height:56px;border-radius:16px;background:rgba(220,237,184,.18);display:grid;place-items:center;color:var(--lime)}
+.s-data .c .ico{width:56px;height:56px;border-radius:16px;background:rgba(207,227,214,.22);display:grid;place-items:center;color:var(--lime)}
 .s-data .c .n{font-size:118px;color:var(--lime);line-height:1.05;margin-top:10px}
 .s-data .c b{font:800 30px "Cairo"}
 .s-data .c span{font:500 22px "IBM Plex Sans Arabic";color:var(--mist);line-height:1.5}
@@ -147,7 +147,7 @@ body.present .bar:hover{opacity:1}
 .s-day .ram b{font:800 34px "Cairo";line-height:1.3}
 .s-day .ram span{font:500 23px "IBM Plex Sans Arabic";color:var(--mist);line-height:1.5}
 .s-day .ram .chips{display:flex;gap:14px;flex-wrap:wrap}
-.s-day .ram .chips i{font-style:normal;background:rgba(220,237,184,.18);color:var(--lime);padding:10px 22px;border-radius:999px;font:700 23px "IBM Plex Sans Arabic"}
+.s-day .ram .chips i{font-style:normal;background:rgba(207,227,214,.22);color:var(--lime);padding:10px 22px;border-radius:999px;font:700 23px "IBM Plex Sans Arabic"}
 
 /* S7 product */
 .s-prod{background:var(--petrol);color:#fff}
@@ -347,7 +347,7 @@ body.present .bar:hover{opacity:1}
     <div>9 اختبارات ثبات</div>
     <div>اختبار توقع على 181 يوماً لم يرها النموذج</div>
   </div>
-  <div class="tools">الأدوات: Python (pandas · statsmodels · hijridate) · d3 للوحة · Claude مساعداً برمجياً موثّقاً في ai_usage_log.md · الكود كاملاً: github.com/maramsaleh-anz/BayHack</div>
+  <div class="tools">الكود منظّم في حزمة bayyin مع 51 اختباراً تعيد إنتاج كل الأرقام حرفاً بحرف · الأدوات: Python (pandas · statsmodels · hijridate) · d3 للوحة · Claude مساعداً برمجياً موثّقاً في ai_usage_log.md</div>
 </div></section></div>
 
 <!-- 4 IMPACT -->
