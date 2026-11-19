@@ -131,16 +131,50 @@
     document.getElementById('plAgenda').replaceChildren(...rows);
   }
 
+  // ---------- reminder budget: the best N days of each month, the gain, and the CSV download ----------
+  const budgetInput = document.getElementById('plBudget');
+  let upcoming = [], picked = new Set();
+  const plain = (m) => '×' + (m >= 10 ? f0(m) : f1(m));
+  function renderBudget() {
+    const n = +budgetInput.value;
+    document.getElementById('plBudgetN').textContent = n;
+    picked = PlannerCore.pickDays(upcoming, n);
+    cells.forEach((button, ms) => button.classList.toggle('pick', picked.has(ms)));
+    const g = PlannerCore.budgetGain(upcoming, picked), out = document.getElementById('plGain');
+    if (!g) { out.textContent = ''; return; }
+    out.replaceChildren(
+      g.count + (g.count >= 3 && g.count <= 10 ? ' أيام مختارة' : ' يوماً مختاراً') + ' في الفترة. متوسط المضاعف فيها ', ltr(plain(g.pickedMean)), ' مقابل ', ltr(plain(g.allMean)),
+      ' لو وُزّعت الرسائل على أيام الفترة كلها، أي أن كل تذكير يقع في يوم أقوى بـ ', el('strong', null, f1(g.gain) + ' مرة'), '.');
+  }
+  function downloadCsv() {
+    const quote = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+    const rows = [['التاريخ', 'اليوم', 'التاريخ الهجري', 'المضاعف المتوقع', 'وقت الإرسال', 'نوع الرسالة', 'السبب']];
+    upcoming.filter((i) => picked.has(i.ms)).forEach((i) => {
+      const iso = new Date(i.ms).toISOString().slice(0, 10);
+      rows.push([iso, WEEKDAYS[i.dow], hijriText(i.h), plain(i.m), (sendTimes(i) || []).join(' و '), messageType(i),
+        i.parts.map(([name]) => name).join(' + ') || 'يوم عادي']);
+    });
+    const blob = new Blob(['\ufeff' + rows.map((r) => r.map(quote).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bayyin_reminders_' + (view === 'ram' ? 'ramadan_' + ramYear : '12_months') + '.csv';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  budgetInput.addEventListener('input', renderBudget);
+  document.getElementById('plDownload').addEventListener('click', downloadCsv);
+
   // ---------- page ----------
   function render() {
     const v = VIEWS[view];
     cells.clear();
     document.getElementById('plCal').replaceChildren(...monthsOf(v).map(([year, month]) => monthCard(year, month, v)));
-    const upcoming = [];
+    upcoming = [];
     for (let ms = Math.max(v.from, todayMs); ms <= v.to; ms += DAY) upcoming.push(info(ms));
     const topDay = upcoming.reduce((a, b) => (b.m > a.m ? b : a));
     renderKpis(upcoming, topDay);
     renderSchedule(upcoming);
+    renderBudget();
     select(topDay.ms);
   }
 

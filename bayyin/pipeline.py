@@ -66,6 +66,7 @@ def collect_tables(*, candidates: pd.DataFrame, not_supported: pd.DataFrame, pay
         "weekday_results": seasons.weekdays, "payday_calendar": calendar,
         "robustness": robustness_table, "robustness_summary": robustness_summary,
         "forecast_errors": forecast.errors.reset_index(names="Days_group"),
+        "forecast_capture": forecast.capture,
         "forecast_daily": forecast.forecast[["Gregorian_Date", "Donors"] + METHODS],
         "hours_weekday_heat": hours.heat.reset_index(), "hours_top_slots": hours.top_slots,
         "excluded_recurring": excluded_recurring.drop(columns="UserID_clean"),

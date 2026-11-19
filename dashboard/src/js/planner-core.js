@@ -173,6 +173,34 @@
     };
   }
 
-  return { DAY, utc, LABELS, createHijri, parseToday, findRamadanStart, seasonOf, salaryPayday, salaryWindowDays,
+  // ------------------------------------------------------------ reminder budget
+  /**
+   * The best `perMonth` days of every Gregorian month (highest multiplier first, earlier day on ties), never on Eid.
+   * @param {Array} days  results of planner.info() for the days that can still be used
+   * @returns {Set<number>} the chosen timestamps
+   */
+  function pickDays(days, perMonth) {
+    const byMonth = new Map();
+    days.filter((i) => !i.eid).forEach((i) => {
+      const d = new Date(i.ms), key = d.getUTCFullYear() * 12 + d.getUTCMonth();
+      if (!byMonth.has(key)) byMonth.set(key, []);
+      byMonth.get(key).push(i);
+    });
+    const picked = new Set();
+    byMonth.forEach((list) => list.slice().sort((a, b) => b.m - a.m || a.ms - b.ms).slice(0, perMonth).forEach((i) => picked.add(i.ms)));
+    return picked;
+  }
+
+  /** Mean multiplier of the chosen days, of all usable days, and how many times better the chosen days are. */
+  function budgetGain(days, picked) {
+    const usable = days.filter((i) => !i.eid);
+    const mean = (list) => list.reduce((a, i) => a + i.m, 0) / list.length;
+    const chosen = usable.filter((i) => picked.has(i.ms));
+    if (!chosen.length) return null;
+    const pickedMean = mean(chosen), allMean = mean(usable);
+    return { pickedMean, allMean, gain: pickedMean / allMean, count: chosen.length };
+  }
+
+  return { DAY, utc, LABELS, pickDays, budgetGain, createHijri, parseToday, findRamadanStart, seasonOf, salaryPayday, salaryWindowDays,
     effectsFrom, peakHours, createPlanner };
 }));

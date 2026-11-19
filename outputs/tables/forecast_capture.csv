@@ -1,0 +1,5 @@
+﻿Days_group,Top_days,Days,Perfect_hindsight,Model,Seasons_only,Same_weekday_last_week,Random
+All test days,10%,181,31.3,30.7,26.1,7.5,9.9
+All test days,20%,181,46.2,45.4,44.6,20.8,19.9
+Ordinary days,10%,137,19.2,15.6,10.2,11.8,10.2
+Ordinary days,20%,137,32.6,28.4,19.7,24.3,19.7
