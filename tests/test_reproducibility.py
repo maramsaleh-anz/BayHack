@@ -20,7 +20,7 @@ def results():
 def test_analysis_reproduces_every_committed_table_byte_for_byte(results, tmp_path):
     pipeline.save_tables(results.tables, tmp_path)
     committed = sorted((ROOT / "outputs" / "tables").glob("*.csv"))
-    assert len(committed) == len(results.tables) == 14
+    assert len(committed) == len(results.tables) == 15
     different = [p.name for p in committed if (tmp_path / p.name).read_bytes() != p.read_bytes()]
     assert not different, f"tables that changed: {different}"
 

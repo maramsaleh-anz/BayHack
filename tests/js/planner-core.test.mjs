@@ -101,3 +101,18 @@ test('the two views: around Ramadan, and the next 12 months', () => {
   assert.equal(new Date(views.year.to).toISOString().slice(0, 10), '2027-10-31');
   assert.ok(views.ram.from < views.ram.to);
 });
+
+test('reminder budget: best N days of each month, never Eid, and a gain above 1', () => {
+  const p = planner('2026-11-19');
+  const days = [];
+  for (let t = p.views.year.from; t <= p.views.year.to; t += core.DAY) if (t >= p.todayMs) days.push(p.info(t));
+  const picked = core.pickDays(days, 3);
+  const perMonth = new Map();
+  picked.forEach((t) => { const k = new Date(t).toISOString().slice(0, 7); perMonth.set(k, (perMonth.get(k) || 0) + 1); });
+  assert.ok([...perMonth.values()].every((n) => n <= 3));
+  assert.ok(days.filter((i) => picked.has(i.ms)).every((i) => !i.eid));
+  assert.ok(picked.has(ms('2027-03-05')), 'Friday 26 Ramadan 1448 (×9) is chosen');
+  const g = core.budgetGain(days, picked);
+  assert.ok(g.gain > 1 && g.count === picked.size);
+  assert.ok(core.budgetGain(days, core.pickDays(days, 10)).gain < g.gain, 'more reminders a month -> weaker days on average');
+});

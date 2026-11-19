@@ -79,9 +79,16 @@
             <span><i class="sw" style="background:var(--surface-2)"></i>عادي</span>
             <span><i class="sw dash"></i>منخفض</span>
             <span><i class="sw hatch"></i>العيد: لا ارتفاع في البيانات</span>
+            <span><i class="sw ring"></i>يوم مختار للتذكير</span>
           </div>
         </div>
         <div class="pl-kpis" id="plKpis"></div>
+        <div class="pl-budget">
+          <label for="plBudget">كم تذكيراً في الشهر؟ <b id="plBudgetN">4</b></label>
+          <input type="range" id="plBudget" min="1" max="10" step="1" value="4">
+          <p class="pl-gain" id="plGain" aria-live="polite"></p>
+          <button type="button" class="pl-dl" id="plDownload">تنزيل جدول التذكيرات (CSV)</button>
+        </div>
         <div class="pl-body">
           <div class="pl-months" id="plCal"></div>
           <aside class="card pl-detail" id="plDetail" aria-live="polite"></aside>

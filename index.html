@@ -192,6 +192,21 @@ footer .wrap { padding-block: 20px; }
 .sw.hatch { background: repeating-linear-gradient(-45deg, var(--surface-2) 0 3px, var(--surface) 3px 6px); border: 1px solid var(--gold); }
 .sw.dash { background: var(--surface); border: 1px dashed var(--muted); }
 @media (max-width: 420px) { .pl-day .x { display: none; } .pl-day { min-height: 44px; } }
+/* Reminder budget: how many reminders a month, the gain, and the CSV download */
+.pl-budget { display: grid; grid-template-columns: auto minmax(120px, 260px) 1fr auto; align-items: center; gap: 10px 16px; margin: 14px 0 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; }
+.pl-budget label { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.pl-budget label b { font-family: var(--font-display); color: var(--accent); font-size: 18px; }
+.pl-budget input[type="range"] { width: 100%; accent-color: var(--accent); }
+.pl-gain { margin: 0; font-size: 13.5px; line-height: 1.7; }
+.pl-gain strong { color: var(--accent); }
+.pl-dl { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--accent); color: var(--accent); background: var(--surface); border-radius: 999px; padding: 6px 14px; cursor: pointer; white-space: nowrap; }
+.pl-dl:hover { background: var(--soft); }
+.pl-dl:focus-visible, .pl-budget input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 760px) { .pl-budget { grid-template-columns: 1fr; } }
+.pl-day { position: relative; }
+.pl-day.pick { box-shadow: inset 0 0 0 2px var(--ink); }
+.pl-day.pick::after { content: ""; position: absolute; top: 4px; inset-inline-start: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.sw.ring { background: var(--surface); box-shadow: inset 0 0 0 2px var(--ink); }
 </style>
 </head>
 <body>
@@ -263,9 +278,16 @@ footer .wrap { padding-block: 20px; }
             <span><i class="sw" style="background:var(--surface-2)"></i>عادي</span>
             <span><i class="sw dash"></i>منخفض</span>
             <span><i class="sw hatch"></i>العيد: لا ارتفاع في البيانات</span>
+            <span><i class="sw ring"></i>يوم مختار للتذكير</span>
           </div>
         </div>
         <div class="pl-kpis" id="plKpis"></div>
+        <div class="pl-budget">
+          <label for="plBudget">كم تذكيراً في الشهر؟ <b id="plBudgetN">4</b></label>
+          <input type="range" id="plBudget" min="1" max="10" step="1" value="4">
+          <p class="pl-gain" id="plGain" aria-live="polite"></p>
+          <button type="button" class="pl-dl" id="plDownload">تنزيل جدول التذكيرات (CSV)</button>
+        </div>
         <div class="pl-body">
           <div class="pl-months" id="plCal"></div>
           <aside class="card pl-detail" id="plDetail" aria-live="polite"></aside>
@@ -574,7 +596,35 @@ const DATA = {"summary":[{"donations":"29522","donors":"1362","amount":"1433853"
     };
   }
 
-  return { DAY, utc, LABELS, createHijri, parseToday, findRamadanStart, seasonOf, salaryPayday, salaryWindowDays,
+  // ------------------------------------------------------------ reminder budget
+  /**
+   * The best `perMonth` days of every Gregorian month (highest multiplier first, earlier day on ties), never on Eid.
+   * @param {Array} days  results of planner.info() for the days that can still be used
+   * @returns {Set<number>} the chosen timestamps
+   */
+  function pickDays(days, perMonth) {
+    const byMonth = new Map();
+    days.filter((i) => !i.eid).forEach((i) => {
+      const d = new Date(i.ms), key = d.getUTCFullYear() * 12 + d.getUTCMonth();
+      if (!byMonth.has(key)) byMonth.set(key, []);
+      byMonth.get(key).push(i);
+    });
+    const picked = new Set();
+    byMonth.forEach((list) => list.slice().sort((a, b) => b.m - a.m || a.ms - b.ms).slice(0, perMonth).forEach((i) => picked.add(i.ms)));
+    return picked;
+  }
+
+  /** Mean multiplier of the chosen days, of all usable days, and how many times better the chosen days are. */
+  function budgetGain(days, picked) {
+    const usable = days.filter((i) => !i.eid);
+    const mean = (list) => list.reduce((a, i) => a + i.m, 0) / list.length;
+    const chosen = usable.filter((i) => picked.has(i.ms));
+    if (!chosen.length) return null;
+    const pickedMean = mean(chosen), allMean = mean(usable);
+    return { pickedMean, allMean, gain: pickedMean / allMean, count: chosen.length };
+  }
+
+  return { DAY, utc, LABELS, pickDays, budgetGain, createHijri, parseToday, findRamadanStart, seasonOf, salaryPayday, salaryWindowDays,
     effectsFrom, peakHours, createPlanner };
 }));
 </script>
@@ -1027,16 +1077,50 @@ document.querySelectorAll('.seg button[data-m]').forEach((b) => b.addEventListen
     document.getElementById('plAgenda').replaceChildren(...rows);
   }
 
+  // ---------- reminder budget: the best N days of each month, the gain, and the CSV download ----------
+  const budgetInput = document.getElementById('plBudget');
+  let upcoming = [], picked = new Set();
+  const plain = (m) => '×' + (m >= 10 ? f0(m) : f1(m));
+  function renderBudget() {
+    const n = +budgetInput.value;
+    document.getElementById('plBudgetN').textContent = n;
+    picked = PlannerCore.pickDays(upcoming, n);
+    cells.forEach((button, ms) => button.classList.toggle('pick', picked.has(ms)));
+    const g = PlannerCore.budgetGain(upcoming, picked), out = document.getElementById('plGain');
+    if (!g) { out.textContent = ''; return; }
+    out.replaceChildren(
+      g.count + (g.count >= 3 && g.count <= 10 ? ' أيام مختارة' : ' يوماً مختاراً') + ' في الفترة. متوسط المضاعف فيها ', ltr(plain(g.pickedMean)), ' مقابل ', ltr(plain(g.allMean)),
+      ' لو وُزّعت الرسائل على أيام الفترة كلها، أي أن كل تذكير يقع في يوم أقوى بـ ', el('strong', null, f1(g.gain) + ' مرة'), '.');
+  }
+  function downloadCsv() {
+    const quote = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+    const rows = [['التاريخ', 'اليوم', 'التاريخ الهجري', 'المضاعف المتوقع', 'وقت الإرسال', 'نوع الرسالة', 'السبب']];
+    upcoming.filter((i) => picked.has(i.ms)).forEach((i) => {
+      const iso = new Date(i.ms).toISOString().slice(0, 10);
+      rows.push([iso, WEEKDAYS[i.dow], hijriText(i.h), plain(i.m), (sendTimes(i) || []).join(' و '), messageType(i),
+        i.parts.map(([name]) => name).join(' + ') || 'يوم عادي']);
+    });
+    const blob = new Blob(['\ufeff' + rows.map((r) => r.map(quote).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bayyin_reminders_' + (view === 'ram' ? 'ramadan_' + ramYear : '12_months') + '.csv';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  budgetInput.addEventListener('input', renderBudget);
+  document.getElementById('plDownload').addEventListener('click', downloadCsv);
+
   // ---------- page ----------
   function render() {
     const v = VIEWS[view];
     cells.clear();
     document.getElementById('plCal').replaceChildren(...monthsOf(v).map(([year, month]) => monthCard(year, month, v)));
-    const upcoming = [];
+    upcoming = [];
     for (let ms = Math.max(v.from, todayMs); ms <= v.to; ms += DAY) upcoming.push(info(ms));
     const topDay = upcoming.reduce((a, b) => (b.m > a.m ? b : a));
     renderKpis(upcoming, topDay);
     renderSchedule(upcoming);
+    renderBudget();
     select(topDay.ms);
   }
 
